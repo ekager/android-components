@@ -65,6 +65,11 @@ abstract class Settings {
     open var historyTrackingDelegate: HistoryTrackingDelegate? by UnsupportedSetting()
 
     /**
+     * Setting to provide a history delegate to the engine.
+     */
+    //open var loginDelegate: LoginDelegate? by UnsupportedSetting()
+
+    /**
      * Setting to control the user agent string.
      */
     open var userAgentString: String? by UnsupportedSetting()
@@ -189,6 +194,7 @@ data class DefaultSettings(
     override var trackingProtectionPolicy: TrackingProtectionPolicy? = null,
     override var requestInterceptor: RequestInterceptor? = null,
     override var historyTrackingDelegate: HistoryTrackingDelegate? = null,
+    //override var loginDelegate: LoginDelegate? = null,
     override var userAgentString: String? = null,
     override var javaScriptCanOpenWindowsAutomatically: Boolean = false,
     override var displayZoomControls: Boolean = true,

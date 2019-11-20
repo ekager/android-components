@@ -32,6 +32,10 @@ projects:
     path: components/concept/sync
     description: 'An abstract definition of a browser data synchronization layer.'
     publish: true
+  feature-autofill:
+    path: components/feature/autofill
+    description: 'Component for autofilling web content and displaying prompts for updating/saving'
+    publish: true
   feature-awesomebar:
     path: components/feature/awesomebar
     description: 'Component connecting a concept-toolbar with a concept-awesomebar.'
