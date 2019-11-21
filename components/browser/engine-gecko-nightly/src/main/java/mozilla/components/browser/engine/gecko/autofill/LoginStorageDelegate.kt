@@ -21,7 +21,7 @@ data class Login(
 )
 
 // Temporary Interface before lands in GV
-interface Delegate {
+internal interface LoginDelegate {
     // Notify that the given login has been used for login.
     // @Fenix: call AsyncLoginsStorage.touch(login.guid).
     fun onLoginUsed(login: Login)
@@ -41,13 +41,13 @@ interface Delegate {
 }
 
 /**
- * [Delegate] implementation.
+ * [LoginDelegate] implementation.
  * App will have to instantiate this and set it on the runtime and pass in the [LoginsStorage] and [SecureAbove22Preferences] with a key that conforms to "passwords"
  */
 class LoginStorageDelegate(
     private val loginStorage: LoginsStorage,
     private val keyStore: SecureAbove22Preferences
-) : Delegate {
+) : LoginDelegate {
     override fun onLoginUsed(login: Login) {
         val passwordsKey = keyStore.getString(PASSWORDS_KEY) ?: return
         loginStorage.ensureUnlocked(passwordsKey).also {
