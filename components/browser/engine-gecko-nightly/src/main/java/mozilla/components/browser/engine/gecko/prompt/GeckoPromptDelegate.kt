@@ -10,6 +10,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.annotation.VisibleForTesting
 import mozilla.components.browser.engine.gecko.GeckoEngineSession
+import mozilla.components.browser.engine.gecko.autofill.Login
 import mozilla.components.concept.engine.prompt.Choice
 import mozilla.components.concept.engine.prompt.PromptRequest
 import mozilla.components.concept.engine.prompt.PromptRequest.MenuChoice
@@ -32,8 +33,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.security.InvalidParameterException
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
+
 
 typealias GeckoAuthOptions = PromptDelegate.AuthPrompt.AuthOptions
 typealias GeckoChoice = PromptDelegate.ChoicePrompt.Choice
@@ -47,12 +48,76 @@ typealias AC_AUTH_LEVEL = PromptRequest.Authentication.Level
 typealias AC_AUTH_METHOD = PromptRequest.Authentication.Method
 typealias AC_FILE_FACING_MODE = PromptRequest.File.FacingMode
 
+internal class LoginStoragePrompt : BasePrompt() {
+    internal inner class Type {
+        var SAVE = 0 // TBD: autocomplete selection.
+// int SELECT;
+    }
+
+    internal inner class Hint {
+        // @Fenix: Automatically save the login and indicate this
+// to the user.
+        var GENERATED = 0
+        // @Fenix: Don’t prompt to save but allow the user to open
+// UI to save if they really want.
+        var PRIVATE_MODE = 0
+        // The data looks like it may be some other data (e.g. CC)
+// entered in a password field.
+// @Fenix: Don’t prompt to save but allow the user to open
+// UI to save if they want (e.g. in case the CC number is
+// actually the username for a credit card account)
+        var LOW_CONFIDENCE = 0 // TBD
+    }
+
+    // Type
+    var type = 0
+    // Hint
+// The hint should help determining the appropriate user
+// prompting behavior.
+// @Fenix: Use the API from application-services/issues/1983 to
+// determine whether to show a Save or Update button on the
+// doorhanger, taking into account un/pw edits in the
+// doorhanger. When the user confirms the save/update.
+    var hint = 0
+    // For SAVE, it will hold the login to be stored or updated.
+// For SELECT, it will hold the logins for the autocomplete
+// selection.
+    var logins: Array<Login>
+
+    // Confirm SAVE prompt: the login would include a user’s edits
+// to what will be saved.
+// Confirm SELECT (autocomplete) prompt by providing the
+// selected login.
+    fun confirm(login: Login?): PromptResponse?
+
+    // Dismiss request.
+    fun dismiss(): PromptResponse?
+}
+
 /**
  * Gecko-based PromptDelegate implementation.
  */
 @Suppress("TooManyFunctions")
 internal class GeckoPromptDelegate(private val geckoEngineSession: GeckoEngineSession) :
     PromptDelegate {
+
+    override fun onLoginStoragePrompt(
+        session: GeckoSession?,
+        prompt: LoginStoragePrompt?
+    ): GeckoResult<PromptResponse?>? {
+        val geckoResult = GeckoResult<PromptResponse>()
+        geckoEngineSession.notifyObservers {
+            onPromptRequest(PromptRequest.Alert(
+                title,
+                message,
+                false,
+                onConfirm
+            ) { _ ->
+                onConfirm()
+            }
+        }
+        return geckoResult
+    }
 
     override fun onChoicePrompt(
         session: GeckoSession,
