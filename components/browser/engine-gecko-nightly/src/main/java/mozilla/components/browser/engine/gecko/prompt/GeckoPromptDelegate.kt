@@ -48,7 +48,7 @@ typealias AC_AUTH_LEVEL = PromptRequest.Authentication.Level
 typealias AC_AUTH_METHOD = PromptRequest.Authentication.Method
 typealias AC_FILE_FACING_MODE = PromptRequest.File.FacingMode
 
-internal class LoginStoragePrompt : BasePrompt() {
+internal class LoginStoragePrompt : PromptDelegate.BasePrompt {
     internal inner class Type {
         var SAVE = 0 // TBD: autocomplete selection.
 // int SELECT;
@@ -107,14 +107,24 @@ internal class GeckoPromptDelegate(private val geckoEngineSession: GeckoEngineSe
     ): GeckoResult<PromptResponse?>? {
         val geckoResult = GeckoResult<PromptResponse>()
         geckoEngineSession.notifyObservers {
-            onPromptRequest(PromptRequest.Alert(
-                title,
-                message,
-                false,
-                onConfirm
-            ) { _ ->
-                onConfirm()
-            }
+            onPromptRequest(
+                PromptRequest.LoginPrompt(
+                    logins = prompt.logins,
+
+
+                // Confirm SAVE prompt: the login would include a user’s edits
+// to what will be saved.
+// Confirm SELECT (autocomplete) prompt by providing the
+// selected login.
+                fun confirm(login: Login?): PromptResponse?
+
+                // Dismiss request.
+                fun dismiss(): PromptResponse?
+                    false,
+                    onConfirm
+                ) { _ ->
+                    onConfirm()
+                }
         }
         return geckoResult
     }

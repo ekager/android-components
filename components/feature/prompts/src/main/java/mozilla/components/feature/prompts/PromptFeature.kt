@@ -353,6 +353,10 @@ class PromptFeature private constructor(
         // Requests that are handled with dialogs
         val dialog = when (promptRequest) {
 
+//            is PromptRequest.LoginPrompt -> LoginFragment.newInstnace(
+//
+//            )
+
             is SingleChoice -> ChoiceDialogFragment.newInstance(
                 promptRequest.choices,
                 session.id, SINGLE_CHOICE_DIALOG_TYPE

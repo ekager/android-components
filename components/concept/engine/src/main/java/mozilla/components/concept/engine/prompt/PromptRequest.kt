@@ -53,6 +53,18 @@ sealed class PromptRequest {
     ) : PromptRequest(), Dismissible
 
     /**
+     * Value type that represents a request for an alert prompt.
+     * @
+     * @property onDismiss callback to let the page know the user dismissed the dialog.
+     * @property onConfirm tells the web page if it should continue showing alerts or not.
+     */
+    data class LoginPrompt(
+        val login = Login,
+        override val onDismiss: () -> Unit,
+        val onConfirm: (Boolean) -> Unit
+    ) : PromptRequest(), Dismissible
+
+    /**
      * Value type that represents a request for an alert prompt to enter a message.
      * @property title title of the dialog.
      * @property inputLabel the label of the field the user should fill.
