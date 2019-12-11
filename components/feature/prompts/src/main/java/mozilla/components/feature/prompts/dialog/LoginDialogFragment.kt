@@ -7,6 +7,7 @@ package mozilla.components.feature.prompts.dialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -21,6 +22,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import mozilla.components.feature.prompts.R
 import mozilla.components.support.ktx.android.content.appName
+import kotlin.reflect.KProperty
 import com.google.android.material.R as MaterialR
 
 private const val KEY_USERNAME_EDIT_TEXT = "KEY_USERNAME_EDIT_TEXT"
@@ -36,35 +38,30 @@ private const val KEY_LOGIN = "KEY_LOGIN"
  */
 internal class LoginDialogFragment : PromptDialogFragment() {
 
-    internal var username: String
-        get() = safeArguments.getString(KEY_USERNAME_EDIT_TEXT, "")
-        set(value) {
-            safeArguments.putString(KEY_USERNAME_EDIT_TEXT, value)
-        }
+    // TODO if we use this pattern elsewhere in the app, it might be worth moving these out for reuse
+    private inner class SafeArgString(private val key: String) {
+        operator fun getValue(frag: LoginDialogFragment, prop: KProperty<*>): String =
+            safeArguments.getString(key, "")
 
-    internal var password: String
-        get() = safeArguments.getString(KEY_PASSWORD_EDIT_TEXT, "")
-        set(value) {
-            safeArguments.putString(KEY_PASSWORD_EDIT_TEXT, value)
+        operator fun setValue(frag: LoginDialogFragment, prop: KProperty<*>, value: String) {
+            safeArguments.putString(key, value)
         }
+    }
 
-    internal var hostName: String
-        get() = safeArguments.getString(KEY_HOSTNAME_TEXT, "")
-        set(value) {
-            safeArguments.putString(KEY_HOSTNAME_TEXT, value)
-        }
+    private inner class SafeArgParcelable<T : Parcelable>(private val key: String) {
+        operator fun getValue(frag: LoginDialogFragment, prop: KProperty<*>): T? =
+            safeArguments.getParcelable<T>(key)
 
-    internal var hint: Hint
-        get() = safeArguments.getParcelable<Hint>(KEY_LOGIN_HINT)
-        set(value) {
-            safeArguments.putParcelable(KEY_LOGIN_HINT, value)
+        operator fun setValue(frag: LoginDialogFragment, prop: KProperty<*>, value: T?) {
+            safeArguments.putParcelable(key, value)
         }
+    }
 
-    internal var login: Login
-        get() = safeArguments.getParcelable<Login>(KEY_LOGIN)
-        set(value) {
-            safeArguments.putParcelable(KEY_LOGIN, value)
-        }
+    internal var username by SafeArgString(KEY_USERNAME_EDIT_TEXT)
+    internal var password by SafeArgString(KEY_PASSWORD_EDIT_TEXT)
+    internal var hostName by SafeArgString(KEY_HOSTNAME_TEXT)
+    internal var hint by SafeArgParcelable<Hint>(KEY_LOGIN_HINT)
+    internal var login by SafeArgParcelable<Login>(KEY_LOGIN)
 
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
