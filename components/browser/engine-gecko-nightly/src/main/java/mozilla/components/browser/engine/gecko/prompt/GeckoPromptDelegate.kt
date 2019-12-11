@@ -23,6 +23,7 @@ import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoSession.PromptDelegate
+import org.mozilla.geckoview.GeckoSession.PromptDelegate.BasePrompt
 import org.mozilla.geckoview.GeckoSession.PromptDelegate.DateTimePrompt.Type.DATE
 import org.mozilla.geckoview.GeckoSession.PromptDelegate.DateTimePrompt.Type.DATETIME_LOCAL
 import org.mozilla.geckoview.GeckoSession.PromptDelegate.DateTimePrompt.Type.MONTH
@@ -48,7 +49,7 @@ typealias AC_AUTH_LEVEL = PromptRequest.Authentication.Level
 typealias AC_AUTH_METHOD = PromptRequest.Authentication.Method
 typealias AC_FILE_FACING_MODE = PromptRequest.File.FacingMode
 
-internal class LoginStoragePrompt : PromptDelegate.BasePrompt {
+internal class LoginStoragePrompt : BasePrompt {
     internal inner class Type {
         var SAVE = 0 // TBD: autocomplete selection.
 // int SELECT;
@@ -101,30 +102,22 @@ internal class LoginStoragePrompt : PromptDelegate.BasePrompt {
 internal class GeckoPromptDelegate(private val geckoEngineSession: GeckoEngineSession) :
     PromptDelegate {
 
-    override fun onLoginStoragePrompt(
-        session: GeckoSession?,
-        prompt: LoginStoragePrompt?
+    fun onLoginStoragePrompt(
+        session: GeckoSession,
+        prompt: LoginStoragePrompt
     ): GeckoResult<PromptResponse?>? {
         val geckoResult = GeckoResult<PromptResponse>()
+        val onConfirmSave: (Login?) -> Unit = { login ->
+            geckoResult.complete(prompt.confirm(login))
+        }
+        // TODO do we need a dismiss for nothing happens and a "deny" for also adding an exception?
         geckoEngineSession.notifyObservers {
             onPromptRequest(
                 PromptRequest.LoginPrompt(
+                    hint = prompt.hint,
                     logins = prompt.logins,
-
-
-                // Confirm SAVE prompt: the login would include a user’s edits
-// to what will be saved.
-// Confirm SELECT (autocomplete) prompt by providing the
-// selected login.
-                fun confirm(login: Login?): PromptResponse?
-
-                // Dismiss request.
-                fun dismiss(): PromptResponse?
-                    false,
-                    onConfirm
-                ) { _ ->
-                    onConfirm()
-                }
+                    onConfirm = onConfirmSave
+                )
         }
         return geckoResult
     }
