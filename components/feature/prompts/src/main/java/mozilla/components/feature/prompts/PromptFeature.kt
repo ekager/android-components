@@ -40,6 +40,7 @@ import mozilla.components.feature.prompts.dialog.ChoiceDialogFragment.Companion.
 import mozilla.components.feature.prompts.dialog.ChoiceDialogFragment.Companion.SINGLE_CHOICE_DIALOG_TYPE
 import mozilla.components.feature.prompts.dialog.ColorPickerDialogFragment
 import mozilla.components.feature.prompts.dialog.ConfirmDialogFragment
+import mozilla.components.feature.prompts.dialog.LoginDialogFragment
 import mozilla.components.feature.prompts.dialog.MultiButtonDialogFragment
 import mozilla.components.feature.prompts.dialog.PromptAbuserDetector
 import mozilla.components.feature.prompts.dialog.PromptDialogFragment
@@ -55,7 +56,7 @@ import mozilla.components.support.base.feature.OnNeedToRequestPermissions
 import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
 import java.security.InvalidParameterException
-import java.util.Date
+import java.util.*
 
 @VisibleForTesting(otherwise = PRIVATE)
 internal const val FRAGMENT_TAG = "mozac_feature_prompt_dialog"
@@ -116,6 +117,7 @@ class PromptFeature private constructor(
         shareDelegate = shareDelegate,
         onNeedToRequestPermissions = onNeedToRequestPermissions
     )
+
     constructor(
         fragment: Fragment,
         store: BrowserStore,
@@ -131,6 +133,7 @@ class PromptFeature private constructor(
         shareDelegate = shareDelegate,
         onNeedToRequestPermissions = onNeedToRequestPermissions
     )
+
     @Deprecated("Pass only activity or fragment instead")
     constructor(
         activity: Activity? = null,
@@ -144,7 +147,7 @@ class PromptFeature private constructor(
             ?: fragment?.let { PromptContainer.Fragment(it) }
             ?: throw IllegalStateException(
                 "activity and fragment references " +
-                    "must not be both null, at least one must be initialized."
+                        "must not be both null, at least one must be initialized."
             ),
         store = store,
         customTabId = customTabId,
@@ -353,9 +356,14 @@ class PromptFeature private constructor(
         // Requests that are handled with dialogs
         val dialog = when (promptRequest) {
 
-//            is PromptRequest.LoginPrompt -> LoginFragment.newInstnace(
-//
-//            )
+            is PromptRequest.LoginPrompt -> LoginDialogFragment.newInstance(
+                sessionId = session.id,
+                hint = promptRequest.hint,
+                login = promptRequest.login[0],
+                username = promptRequest.logins[0].userName,
+                password = promptRequest.logins[0].password,
+                hostName = promptRequest.logins[0].hostName
+            )
 
             is SingleChoice -> ChoiceDialogFragment.newInstance(
                 promptRequest.choices,
@@ -495,6 +503,7 @@ class PromptFeature private constructor(
             is Color,
             is Authentication,
             is PromptRequest.Popup,
+            is PromptRequest.LoginPrompt,
             is Share -> true
             is Alert, is TextPrompt, is PromptRequest.Confirm -> promptAbuserDetector.shouldShowMoreDialogs
         }
