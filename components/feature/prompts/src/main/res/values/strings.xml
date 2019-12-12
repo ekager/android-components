@@ -23,6 +23,8 @@
     <string name="mozac_feature_prompt_dont_save">Don’t save</string>
     <!-- Positive confirmation that we should save the new or updated login -->
     <string name="mozac_feature_prompt_save_confirmation">Save</string>
+    <!-- Positive confirmation that we should save the updated login -->
+    <string name="mozac_feature_prompt_update_confirmation">Update</string>
     <!-- Prompt message displayed when app detects a user has entered a password and user decides if app should save it. The first parameter is the name of the application (For example: Fenix)  -->
     <string name="mozac_feature_prompt_logins_save_message">Do you want %s to save this login?</string>
     <!-- Text for a label for the field when prompt requesting a text is shown. -->

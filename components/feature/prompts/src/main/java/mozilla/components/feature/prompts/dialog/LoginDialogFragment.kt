@@ -48,6 +48,11 @@ internal class LoginDialogFragment : PromptDialogFragment() {
     internal var hint by SafeArgParcelable<Hint>(KEY_LOGIN_HINT)
     internal var login by SafeArgParcelable<Login>(KEY_LOGIN)
     internal var username = login.username
+        set(newUsername) {
+            field = newUsername
+            updateSaveButton()
+        }
+
     internal var password = login.password
     internal var hostName = login.origin
 
@@ -109,6 +114,7 @@ internal class LoginDialogFragment : PromptDialogFragment() {
         )
         bindUsername(rootView)
         bindPassword(rootView)
+        updateSaveButton()
         return rootView
     }
 
@@ -147,6 +153,18 @@ internal class LoginDialogFragment : PromptDialogFragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
         })
+    }
+
+    private fun updateSaveButton() {
+        val updatedLogin = login.copy(username = username, password = password)
+        val loginExists = feature?.loginsDelegate?.loginExists(updatedLogin) == true
+        val confirmText = if (loginExists) {
+            R.string.mozac_feature_prompt_update_confirmation
+        } else {
+            R.string.mozac_feature_prompt_save_confirmation
+        }
+
+        view?.findViewById<Button>(R.id.save_confirm)?.text = context?.getString(confirmText)
     }
 
     companion object {
