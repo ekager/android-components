@@ -18,7 +18,6 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import mozilla.components.concept.engine.Hint
 import mozilla.components.concept.engine.Login
@@ -99,7 +98,7 @@ internal class LoginDialogFragment : PromptDialogFragment() {
         saveMessage.text =
             getString(R.string.mozac_feature_prompt_logins_save_message, activity?.appName)
 
-        val saveConfirm = view.findViewById<MaterialButton>(R.id.save_confirm)
+        val saveConfirm = view.findViewById<Button>(R.id.save_confirm)
         val cancelButton = view.findViewById<Button>(R.id.save_cancel)
 
         saveConfirm.setOnClickListener {
