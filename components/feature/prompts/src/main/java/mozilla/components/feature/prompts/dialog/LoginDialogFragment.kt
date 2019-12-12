@@ -20,6 +20,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
+import mozilla.components.concept.engine.Hint
+import mozilla.components.concept.engine.Login
 import mozilla.components.feature.prompts.R
 import mozilla.components.support.ktx.android.content.appName
 import kotlin.reflect.KProperty
@@ -49,8 +51,9 @@ internal class LoginDialogFragment : PromptDialogFragment() {
     }
 
     private inner class SafeArgParcelable<T : Parcelable>(private val key: String) {
-        operator fun getValue(frag: LoginDialogFragment, prop: KProperty<*>): T? =
-            safeArguments.getParcelable<T>(key)
+        operator fun getValue(frag: LoginDialogFragment, prop: KProperty<*>): T =
+            // TODO This _should_ be guaranteed by SafeArgs.  Verify this
+            safeArguments.getParcelable<T>(key)!!
 
         operator fun setValue(frag: LoginDialogFragment, prop: KProperty<*>, value: T?) {
             safeArguments.putParcelable(key, value)

@@ -5,21 +5,10 @@ package mozilla.components.browser.engine.gecko.autofill
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import mozilla.appservices.logins.LoginsStorage
+import mozilla.components.concept.engine.Login
 import mozilla.components.lib.dataprotect.SecureAbove22Preferences
 import mozilla.components.service.sync.logins.ServerPassword
 import org.mozilla.geckoview.GeckoResult
-
-// Temporary Data Class before lands in GV
-data class Login(
-    var guid: String? = null,
-    // @Fenix: currently called `hostname` in AsyncLoginsStorage.
-    var origin: String? = null,
-    // @Fenix: currently called `formSubmitURL` in AsyncLoginsStorage
-    var formActionOrigin: String? = null,
-    var httpRealm: String? = null,
-    var username: String? = null,
-    var password: String? = null
-)
 
 // Temporary Interface before lands in GV
 internal interface LoginDelegate {
@@ -72,6 +61,7 @@ class LoginStorageDelegate(
         }
     }
 
+    // TODO double check that we're locking correctly.  Also, does this need to be synchronized?
     // Request to save or update the given login.
     override fun onLoginSave(login: Login) {
         val passwordsKey = keyStore.getString(PASSWORDS_KEY) ?: return

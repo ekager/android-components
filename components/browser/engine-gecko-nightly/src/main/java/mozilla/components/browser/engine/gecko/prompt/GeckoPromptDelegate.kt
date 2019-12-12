@@ -10,7 +10,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.annotation.VisibleForTesting
 import mozilla.components.browser.engine.gecko.GeckoEngineSession
-import mozilla.components.browser.engine.gecko.autofill.Login
+import mozilla.components.concept.engine.Login
 import mozilla.components.concept.engine.prompt.Choice
 import mozilla.components.concept.engine.prompt.PromptRequest
 import mozilla.components.concept.engine.prompt.PromptRequest.MenuChoice
@@ -49,29 +49,14 @@ typealias AC_AUTH_LEVEL = PromptRequest.Authentication.Level
 typealias AC_AUTH_METHOD = PromptRequest.Authentication.Method
 typealias AC_FILE_FACING_MODE = PromptRequest.File.FacingMode
 
-internal class LoginStoragePrompt : BasePrompt {
-    internal inner class Type {
-        var SAVE = 0 // TBD: autocomplete selection.
-// int SELECT;
-    }
-
-    internal inner class Hint {
-        // @Fenix: Automatically save the login and indicate this
-// to the user.
-        var GENERATED = 0
-        // @Fenix: Don’t prompt to save but allow the user to open
-// UI to save if they really want.
-        var PRIVATE_MODE = 0
-        // The data looks like it may be some other data (e.g. CC)
-// entered in a password field.
-// @Fenix: Don’t prompt to save but allow the user to open
-// UI to save if they want (e.g. in case the CC number is
-// actually the username for a credit card account)
-        var LOW_CONFIDENCE = 0 // TBD
-    }
+internal interface LoginStoragePrompt {
+//    internal class Type {
+//        var SAVE = 0 // TBD: autocomplete selection.
+//// int SELECT;
+//    }
 
     // Type
-    var type = 0
+    var type: Int
     // Hint
 // The hint should help determining the appropriate user
 // prompting behavior.
@@ -79,7 +64,7 @@ internal class LoginStoragePrompt : BasePrompt {
 // determine whether to show a Save or Update button on the
 // doorhanger, taking into account un/pw edits in the
 // doorhanger. When the user confirms the save/update.
-    var hint = 0
+    var hint: Int
     // For SAVE, it will hold the login to be stored or updated.
 // For SELECT, it will hold the logins for the autocomplete
 // selection.
@@ -105,19 +90,20 @@ internal class GeckoPromptDelegate(private val geckoEngineSession: GeckoEngineSe
     fun onLoginStoragePrompt(
         session: GeckoSession,
         prompt: LoginStoragePrompt
-    ): GeckoResult<PromptResponse?>? {
+    ): GeckoResult<PromptResponse>? {
         val geckoResult = GeckoResult<PromptResponse>()
         val onConfirmSave: (Login?) -> Unit = { login ->
             geckoResult.complete(prompt.confirm(login))
         }
-        // TODO do we need a dismiss for nothing happens and a "deny" for also adding an exception?
         geckoEngineSession.notifyObservers {
             onPromptRequest(
                 PromptRequest.LoginPrompt(
                     hint = prompt.hint,
                     logins = prompt.logins,
-                    onConfirm = onConfirmSave
+                    onConfirm = onConfirmSave,
+                    onDismiss = { prompt.dismiss() }
                 )
+            )
         }
         return geckoResult
     }
