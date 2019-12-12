@@ -10,6 +10,7 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.annotation.VisibleForTesting
 import mozilla.components.browser.engine.gecko.GeckoEngineSession
+import mozilla.components.concept.engine.Hint
 import mozilla.components.concept.engine.Login
 import mozilla.components.concept.engine.prompt.Choice
 import mozilla.components.concept.engine.prompt.PromptRequest
@@ -50,7 +51,7 @@ typealias AC_FILE_FACING_MODE = PromptRequest.File.FacingMode
 
 internal interface LoginStoragePrompt {
     var type: Int
-    var hint: Int
+    var hint: Hint
     var logins: Array<Login>
     fun confirm(login: Login?): PromptResponse?
     fun dismiss(): PromptResponse?

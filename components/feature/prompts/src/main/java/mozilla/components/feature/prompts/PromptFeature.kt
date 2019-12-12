@@ -20,8 +20,6 @@ import mozilla.components.browser.state.selector.findTabOrCustomTab
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.SessionState
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.concept.engine.Hint
-import mozilla.components.concept.engine.Login
 import mozilla.components.concept.engine.prompt.Choice
 import mozilla.components.concept.engine.prompt.PromptRequest
 import mozilla.components.concept.engine.prompt.PromptRequest.Alert
@@ -61,7 +59,6 @@ import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
 import java.security.InvalidParameterException
 import java.util.Date
-import java.util.UUID
 
 @VisibleForTesting(otherwise = PRIVATE)
 internal const val FRAGMENT_TAG = "mozac_feature_prompt_dialog"
