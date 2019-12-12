@@ -6,13 +6,14 @@ package mozilla.components.feature.prompts.logins
 
 data class Login(
     private val password: String,
-    private val username: String)
+    private val username: String
+)
 
 /**
  * Delegate to display a share prompt.
  */
 interface LoginsDelegate {
-    fun loginExists(login: Login) : Boolean
+    fun loginExists(login: Login): Boolean
 }
 
 /**

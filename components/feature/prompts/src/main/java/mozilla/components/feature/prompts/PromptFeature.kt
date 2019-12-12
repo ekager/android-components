@@ -58,7 +58,7 @@ import mozilla.components.support.base.feature.OnNeedToRequestPermissions
 import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
 import java.security.InvalidParameterException
-import java.util.*
+import java.util.Date
 
 @VisibleForTesting(otherwise = PRIVATE)
 internal const val FRAGMENT_TAG = "mozac_feature_prompt_dialog"

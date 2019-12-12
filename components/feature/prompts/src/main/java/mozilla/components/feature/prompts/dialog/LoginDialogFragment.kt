@@ -66,7 +66,6 @@ internal class LoginDialogFragment : PromptDialogFragment() {
     internal var hint by SafeArgParcelable<Hint>(KEY_LOGIN_HINT)
     internal var login by SafeArgParcelable<Login>(KEY_LOGIN)
 
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // TODO how do we theme this dialog correctly?
 

@@ -23,7 +23,6 @@ import org.mozilla.geckoview.AllowOrDeny
 import org.mozilla.geckoview.GeckoResult
 import org.mozilla.geckoview.GeckoSession
 import org.mozilla.geckoview.GeckoSession.PromptDelegate
-import org.mozilla.geckoview.GeckoSession.PromptDelegate.BasePrompt
 import org.mozilla.geckoview.GeckoSession.PromptDelegate.DateTimePrompt.Type.DATE
 import org.mozilla.geckoview.GeckoSession.PromptDelegate.DateTimePrompt.Type.DATETIME_LOCAL
 import org.mozilla.geckoview.GeckoSession.PromptDelegate.DateTimePrompt.Type.MONTH
@@ -34,8 +33,8 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.security.InvalidParameterException
 import java.text.SimpleDateFormat
-import java.util.*
-
+import java.util.Date
+import java.util.Locale
 
 typealias GeckoAuthOptions = PromptDelegate.AuthPrompt.AuthOptions
 typealias GeckoChoice = PromptDelegate.ChoicePrompt.Choice
@@ -50,33 +49,10 @@ typealias AC_AUTH_METHOD = PromptRequest.Authentication.Method
 typealias AC_FILE_FACING_MODE = PromptRequest.File.FacingMode
 
 internal interface LoginStoragePrompt {
-//    internal class Type {
-//        var SAVE = 0 // TBD: autocomplete selection.
-//// int SELECT;
-//    }
-
-    // Type
     var type: Int
-    // Hint
-// The hint should help determining the appropriate user
-// prompting behavior.
-// @Fenix: Use the API from application-services/issues/1983 to
-// determine whether to show a Save or Update button on the
-// doorhanger, taking into account un/pw edits in the
-// doorhanger. When the user confirms the save/update.
     var hint: Int
-    // For SAVE, it will hold the login to be stored or updated.
-// For SELECT, it will hold the logins for the autocomplete
-// selection.
     var logins: Array<Login>
-
-    // Confirm SAVE prompt: the login would include a user’s edits
-// to what will be saved.
-// Confirm SELECT (autocomplete) prompt by providing the
-// selected login.
     fun confirm(login: Login?): PromptResponse?
-
-    // Dismiss request.
     fun dismiss(): PromptResponse?
 }
 
