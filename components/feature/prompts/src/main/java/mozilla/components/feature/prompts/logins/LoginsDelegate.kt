@@ -7,14 +7,14 @@ package mozilla.components.feature.prompts.logins
 import mozilla.components.concept.engine.Login
 
 /**
- * Delegate to display a share prompt.
+ * Delegate to connect logins storage to the prompt
  */
 interface LoginsDelegate {
     fun loginExists(login: Login): Boolean
 }
 
 /**
- * Default [ShareDelegate] implementation that displays the native share sheet.
+ * Default [LoginsDelegate] implementation that returns false
  */
 class DefaultLoginsDelegate : LoginsDelegate {
     override fun loginExists(login: Login): Boolean {

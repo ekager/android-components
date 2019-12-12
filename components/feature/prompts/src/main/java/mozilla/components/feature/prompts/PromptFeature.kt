@@ -101,7 +101,7 @@ class PromptFeature private constructor(
     private var customTabId: String?,
     private val fragmentManager: FragmentManager,
     private val shareDelegate: ShareDelegate,
-    private val loginStorageDelegate: LoginsDelegate,
+    override val loginsDelegate: LoginsDelegate,
     onNeedToRequestPermissions: OnNeedToRequestPermissions
 ) : LifecycleAwareFeature, PermissionsFeature, Prompter {
     private var scope: CoroutineScope? = null
@@ -115,7 +115,7 @@ class PromptFeature private constructor(
         customTabId: String? = null,
         fragmentManager: FragmentManager,
         shareDelegate: ShareDelegate = DefaultShareDelegate(),
-        loginStorageDelegate: LoginsDelegate = DefaultLoginsDelegate(),
+        loginsDelegate: LoginsDelegate = DefaultLoginsDelegate(),
         onNeedToRequestPermissions: OnNeedToRequestPermissions
     ) : this(
         container = PromptContainer.Activity(activity),
@@ -123,7 +123,7 @@ class PromptFeature private constructor(
         customTabId = customTabId,
         fragmentManager = fragmentManager,
         shareDelegate = shareDelegate,
-        loginStorageDelegate = loginStorageDelegate,
+        loginsDelegate = loginsDelegate,
         onNeedToRequestPermissions = onNeedToRequestPermissions
     )
 
@@ -133,7 +133,7 @@ class PromptFeature private constructor(
         customTabId: String? = null,
         fragmentManager: FragmentManager,
         shareDelegate: ShareDelegate = DefaultShareDelegate(),
-        loginStorageDelegate: LoginsDelegate = DefaultLoginsDelegate(),
+        loginsDelegate: LoginsDelegate = DefaultLoginsDelegate(),
         onNeedToRequestPermissions: OnNeedToRequestPermissions
     ) : this(
         container = PromptContainer.Fragment(fragment),
@@ -141,7 +141,7 @@ class PromptFeature private constructor(
         customTabId = customTabId,
         fragmentManager = fragmentManager,
         shareDelegate = shareDelegate,
-        loginStorageDelegate = loginStorageDelegate,
+        loginsDelegate = loginsDelegate,
         onNeedToRequestPermissions = onNeedToRequestPermissions
     )
 
@@ -164,7 +164,7 @@ class PromptFeature private constructor(
         customTabId = customTabId,
         fragmentManager = fragmentManager,
         shareDelegate = DefaultShareDelegate(),
-        loginStorageDelegate = DefaultLoginsDelegate(),
+        loginsDelegate = DefaultLoginsDelegate(),
         onNeedToRequestPermissions = onNeedToRequestPermissions
     )
 
@@ -369,23 +369,10 @@ class PromptFeature private constructor(
         val dialog = when (promptRequest) {
 
             is PromptRequest.LoginPrompt -> {
-                // TODO figure out exactly how this will all work together. We need to change the dialog to show update/save depending on if it matches a login we already have
-                // TODO Also do we want to use the delegate to save or should we keep relying on the GV routing to onLoginSave
-                // @Fenix: Use the API from application-services/issues/1983 to
-                // determine whether to show a Save or Update button on the
-                // doorhanger, taking into account un/pw edits in the
-                // doorhanger. When the user confirms the save/update.
-
-                // Maybe we can pass the logins delegate in here to update the save/update button as needed as the text changes via the API above. `ensureValid`
-                val loginExists = loginStorageDelegate.loginExists(promptRequest.logins[0])
-                println(loginExists)
                 LoginDialogFragment.newInstance(
                     sessionId = session.id,
                     hint = promptRequest.hint,
-                    login = promptRequest.logins[0],
-                    username = promptRequest.logins[0].username ?: "",
-                    password = promptRequest.logins[0].password ?: "",
-                    hostName = promptRequest.logins[0].origin ?: ""
+                    login = promptRequest.logins[0]
                 )
             }
 

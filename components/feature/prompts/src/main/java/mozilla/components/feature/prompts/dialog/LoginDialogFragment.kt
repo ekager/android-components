@@ -26,9 +26,6 @@ import mozilla.components.support.ktx.android.content.appName
 import kotlin.reflect.KProperty
 import com.google.android.material.R as MaterialR
 
-private const val KEY_USERNAME_EDIT_TEXT = "KEY_USERNAME_EDIT_TEXT"
-private const val KEY_PASSWORD_EDIT_TEXT = "KEY_PASSWORD_EDIT_TEXT"
-private const val KEY_HOSTNAME_TEXT = "KEY_HOSTNAME_TEXT"
 private const val KEY_LOGIN_HINT = "KEY_LOGIN_HINT"
 private const val KEY_LOGIN = "KEY_LOGIN"
 
@@ -38,17 +35,6 @@ private const val KEY_LOGIN = "KEY_LOGIN"
  * dialog with native dialogs.
  */
 internal class LoginDialogFragment : PromptDialogFragment() {
-
-    // TODO if we use this pattern elsewhere in the app, it might be worth moving these out for reuse
-    private inner class SafeArgString(private val key: String) {
-        operator fun getValue(frag: LoginDialogFragment, prop: KProperty<*>): String =
-            safeArguments.getString(key, "")
-
-        operator fun setValue(frag: LoginDialogFragment, prop: KProperty<*>, value: String) {
-            safeArguments.putString(key, value)
-        }
-    }
-
     private inner class SafeArgParcelable<T : Parcelable>(private val key: String) {
         operator fun getValue(frag: LoginDialogFragment, prop: KProperty<*>): T =
             // TODO This _should_ be guaranteed by SafeArgs.  Verify this
@@ -59,15 +45,13 @@ internal class LoginDialogFragment : PromptDialogFragment() {
         }
     }
 
-    internal var username by SafeArgString(KEY_USERNAME_EDIT_TEXT)
-    internal var password by SafeArgString(KEY_PASSWORD_EDIT_TEXT)
-    internal var hostName by SafeArgString(KEY_HOSTNAME_TEXT)
     internal var hint by SafeArgParcelable<Hint>(KEY_LOGIN_HINT)
     internal var login by SafeArgParcelable<Login>(KEY_LOGIN)
+    internal var username = login.username
+    internal var password = login.password
+    internal var hostName = login.origin
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        // TODO how do we theme this dialog correctly?
-
         return BottomSheetDialog(requireContext(), this.theme).apply {
             setOnShowListener {
                 val bottomSheet =
@@ -93,8 +77,6 @@ internal class LoginDialogFragment : PromptDialogFragment() {
 
         val saveMessage = view.findViewById<TextView>(R.id.save_message)
 
-        // TODO how do I get the app name correctly here?
-        // TODO this should be save or update depending on the hints / if login already exists?
         saveMessage.text =
             getString(R.string.mozac_feature_prompt_logins_save_message, activity?.appName)
 
@@ -106,8 +88,6 @@ internal class LoginDialogFragment : PromptDialogFragment() {
         }
 
         cancelButton.setOnClickListener {
-            // TODO the negative action also needs to add an exception...
-            //  What's the best place to do this? Maybe we also have to ask GV to route the negative action to onLoginSaved
             feature?.onCancel(sessionId)
         }
     }
@@ -173,17 +153,12 @@ internal class LoginDialogFragment : PromptDialogFragment() {
         /**
          * A builder method for creating a [LoginDialogFragment]
          * @param sessionId the id of the session for which this dialog will be created.
-         * @param username the default value of the username text field.
-         * @param password the default value of the password text field.
-         * @param hostName the host of the site of the login.
-         */
+         * @param login
+         * */
         fun newInstance(
             sessionId: String,
             hint: Hint,
-            login: Login,
-            username: String,
-            password: String,
-            hostName: String
+            login: Login
         ): LoginDialogFragment {
 
             val fragment = LoginDialogFragment()
@@ -193,9 +168,6 @@ internal class LoginDialogFragment : PromptDialogFragment() {
                 putString(KEY_SESSION_ID, sessionId)
                 putParcelable(KEY_LOGIN_HINT, hint)
                 putParcelable(KEY_LOGIN, login)
-                putString(KEY_USERNAME_EDIT_TEXT, username)
-                putString(KEY_PASSWORD_EDIT_TEXT, password)
-                putString(KEY_HOSTNAME_TEXT, hostName)
             }
 
             fragment.arguments = arguments
