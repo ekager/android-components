@@ -9,10 +9,8 @@ package mozilla.components.concept.engine
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
-// Temporary Data Class before lands in GV
-/**
- *
- */
+// These classes will be provided by GV. These temporary files allow us to start our work
+// before theirs lands, after which this file will be deleted.
 @Parcelize
 data class Login(
     var guid: String? = null,
@@ -23,9 +21,6 @@ data class Login(
     var password: String? = null
 ) : Parcelable
 
-/**
- *
- */
 @Parcelize
 class Hint : Parcelable {
     var GENERATED = 0

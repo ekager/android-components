@@ -12,21 +12,8 @@ import org.mozilla.geckoview.GeckoResult
 
 // Temporary Interface before lands in GV
 internal interface LoginDelegate {
-    // Notify that the given login has been used for login.
-    // @Fenix: call AsyncLoginsStorage.touch(login.guid).
     fun onLoginUsed(login: Login)
-
-    // Request logins for the given domain.
-    // @Fenix: return AsyncLoginsStorage.getByHostname(domain).
     fun onFetchLogins(domain: String): GeckoResult<Array<Login>>
-
-    // Request to save or update the given login.
-    // The hint should help determining the appropriate user prompting
-    // behavior.
-    // @Fenix: Use the API from application-services/issues/1983 to
-    // determine whether to show a Save or Update button on the
-    // doorhanger, taking into account un/pw edits in the doorhanger.
-    // When the user confirms the save/update,
     fun onLoginSave(login: Login)
 }
 
@@ -63,6 +50,7 @@ class LoginStorageDelegate(
 
     // TODO double check that we're locking correctly.  Also, does this need to be synchronized?
     // Request to save or update the given login.
+    @Synchronized
     override fun onLoginSave(login: Login) {
         val passwordsKey = keyStore.getString(PASSWORDS_KEY) ?: return
         loginStorage.ensureUnlocked(passwordsKey).also {

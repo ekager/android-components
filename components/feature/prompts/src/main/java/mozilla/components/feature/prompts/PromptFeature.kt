@@ -403,30 +403,14 @@ class PromptFeature private constructor(
             )
 
             is Alert -> {
-                // TODO this is just for testing
-//                with(promptRequest) {
-//                    AlertDialogFragment.newInstance(
-//                        session.id,
-//                        title,
-//                        message,
-//                        promptAbuserDetector.areDialogsBeingAbused()
-//                    )
-//                }
-                LoginDialogFragment.newInstance(
-                    session.id,
-                    Hint(),
-                    Login(
-                        UUID.randomUUID().toString(),
-                        "https://www.mozilla.org",
-                        "form action origin",
-                        "http Realm",
-                        "username",
-                        "password"
-                    ),
-                    "username",
-                    "password",
-                    "hostname"
-                )
+                with(promptRequest) {
+                    AlertDialogFragment.newInstance(
+                        session.id,
+                        title,
+                        message,
+                        promptAbuserDetector.areDialogsBeingAbused()
+                    )
+                }
             }
 
             is TimeSelection -> {
