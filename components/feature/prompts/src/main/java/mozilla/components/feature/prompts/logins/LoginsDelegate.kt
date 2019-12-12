@@ -4,10 +4,7 @@
 
 package mozilla.components.feature.prompts.logins
 
-data class Login(
-    private val password: String,
-    private val username: String
-)
+import mozilla.components.concept.engine.Login
 
 /**
  * Delegate to display a share prompt.

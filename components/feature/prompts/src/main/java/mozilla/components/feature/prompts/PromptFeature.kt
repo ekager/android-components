@@ -20,6 +20,8 @@ import mozilla.components.browser.state.selector.findTabOrCustomTab
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.SessionState
 import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.concept.engine.Hint
+import mozilla.components.concept.engine.Login
 import mozilla.components.concept.engine.prompt.Choice
 import mozilla.components.concept.engine.prompt.PromptRequest
 import mozilla.components.concept.engine.prompt.PromptRequest.Alert
@@ -59,6 +61,7 @@ import mozilla.components.support.base.feature.PermissionsFeature
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
 import java.security.InvalidParameterException
 import java.util.Date
+import java.util.UUID
 
 @VisibleForTesting(otherwise = PRIVATE)
 internal const val FRAGMENT_TAG = "mozac_feature_prompt_dialog"
@@ -375,13 +378,14 @@ class PromptFeature private constructor(
 
                 // Maybe we can pass the logins delegate in here to update the save/update button as needed as the text changes via the API above. `ensureValid`
                 val loginExists = loginStorageDelegate.loginExists(promptRequest.logins[0])
+                println(loginExists)
                 LoginDialogFragment.newInstance(
                     sessionId = session.id,
                     hint = promptRequest.hint,
                     login = promptRequest.logins[0],
-                    username = promptRequest.logins[0].userName,
-                    password = promptRequest.logins[0].password,
-                    hostName = promptRequest.logins[0].hostName
+                    username = promptRequest.logins[0].username ?: "",
+                    password = promptRequest.logins[0].password ?: "",
+                    hostName = promptRequest.logins[0].origin ?: ""
                 )
             }
 
@@ -399,14 +403,30 @@ class PromptFeature private constructor(
             )
 
             is Alert -> {
-                with(promptRequest) {
-                    AlertDialogFragment.newInstance(
-                        session.id,
-                        title,
-                        message,
-                        promptAbuserDetector.areDialogsBeingAbused()
-                    )
-                }
+                // TODO this is just for testing
+//                with(promptRequest) {
+//                    AlertDialogFragment.newInstance(
+//                        session.id,
+//                        title,
+//                        message,
+//                        promptAbuserDetector.areDialogsBeingAbused()
+//                    )
+//                }
+                LoginDialogFragment.newInstance(
+                    session.id,
+                    Hint(),
+                    Login(
+                        UUID.randomUUID().toString(),
+                        "https://www.mozilla.org",
+                        "form action origin",
+                        "http Realm",
+                        "username",
+                        "password"
+                    ),
+                    "username",
+                    "password",
+                    "hostname"
+                )
             }
 
             is TimeSelection -> {
