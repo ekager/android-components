@@ -14,6 +14,9 @@ import android.util.Base64
 import mozilla.components.support.base.log.logger.Logger
 import java.nio.charset.StandardCharsets
 import java.security.GeneralSecurityException
+import java.security.KeyStoreException
+import java.security.NoSuchAlgorithmException
+import java.security.UnrecoverableKeyException
 
 private interface KeyValuePreferences {
     /**
@@ -62,7 +65,11 @@ private interface KeyValuePreferences {
  */
 class SecureAbove22Preferences(context: Context, name: String) : KeyValuePreferences {
     private val impl = if (Build.VERSION.SDK_INT >= M) {
-        SecurePreferencesImpl23(context, name)
+        val securePrefs = SecurePreferencesImpl23(context, name)
+        if (securePrefs.testKeystore()) securePrefs else InsecurePreferencesImpl21(
+            context,
+            name
+        )
     } else {
         InsecurePreferencesImpl21(context, name)
     }
@@ -123,16 +130,37 @@ private class SecurePreferencesImpl23(context: Context, name: String) : KeyValue
     private val keystore = Keystore(context.packageName)
 
     init {
-        // Check if we have any plaintext values stored on disk. That indicates that we've hit an API upgrade situation.
-        // We just went from pre-M to post-M. Since we already have the plaintext keys, we can transparently migrate
-        // them to use the encrypted storage layer.
-        val insecureStorage = InsecurePreferencesImpl21(context, name)
-        // Copy over any old values.
-        insecureStorage.all().forEach {
-            putString(it.key, it.value)
+        if (testKeystore()) {
+            // Check if we have any plaintext values stored on disk. That indicates that we've hit an API upgrade situation.
+            // We just went from pre-M to post-M. Since we already have the plaintext keys, we can transparently migrate
+            // them to use the encrypted storage layer.
+            val insecureStorage = InsecurePreferencesImpl21(context, name)
+            // Copy over any old values.
+            insecureStorage.all().forEach {
+                putString(it.key, it.value)
+            }
+            // Erase old storage.
+            insecureStorage.clear()
         }
-        // Erase old storage.
-        insecureStorage.clear()
+    }
+
+    fun testKeystore(): Boolean {
+        return try {
+            generateManagedKeyIfNecessary()
+            true
+        } catch (keyStoreException: KeyStoreException) {
+            logger.error("KeyStoreException exception: ", keyStoreException)
+            false
+        } catch (noSuchAlgorithmException: NoSuchAlgorithmException) {
+            logger.error("NoSuchAlgorithmException exception: ", noSuchAlgorithmException)
+            false
+        } catch (unrecoverableKeyException: UnrecoverableKeyException) {
+            logger.error("UnrecoverableKeyException exception: ", unrecoverableKeyException)
+            false
+        } catch (error: GeneralSecurityException) {
+            logger.error("GeneralSecurityException exception: ", error)
+            false
+        }
     }
 
     override fun all(): Map<String, String> {
@@ -147,7 +175,12 @@ private class SecurePreferencesImpl23(context: Context, name: String) : KeyValue
         // The fact that we're possibly generating a managed key here implies that this key could be lost after being
         // for some reason. One possible reason for a key to be lost is rotating signing keys for the APK.
         // Applications are encouraged to instrument such events.
-        generateManagedKeyIfNecessary()
+        try {
+            generateManagedKeyIfNecessary()
+        } catch (error: GeneralSecurityException) {
+            logger.error("Generate managed key exception: ", error)
+            return null
+        }
 
         if (!prefs.contains(key)) {
             return null
