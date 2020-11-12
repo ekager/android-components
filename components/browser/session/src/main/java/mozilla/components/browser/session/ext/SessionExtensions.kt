@@ -42,7 +42,8 @@ fun Session.toCustomTabSessionState(): CustomTabSessionState {
 
 private fun Session.toContentState(): ContentState {
     return ContentState(
-        url,
+        url = url,
+        initialUrl = initialUrl,
         private,
         title,
         progress,

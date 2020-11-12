@@ -9,6 +9,7 @@ import android.graphics.Bitmap
 import mozilla.components.browser.session.engine.request.LaunchIntentMetadata
 import mozilla.components.browser.session.ext.syncDispatch
 import mozilla.components.browser.session.ext.toSecurityInfoState
+import mozilla.components.browser.state.action.ContentAction
 import mozilla.components.browser.state.action.ContentAction.RemoveWebAppManifestAction
 import mozilla.components.browser.state.action.ContentAction.UpdateBackNavigationStateAction
 import mozilla.components.browser.state.action.ContentAction.UpdateForwardNavigationStateAction
@@ -60,6 +61,7 @@ class Session(
      * Interface to be implemented by classes that want to observe a session.
      */
     interface Observer {
+        fun onInitialUrlChanged(session: Session, url: String) = Unit
         fun onUrlChanged(session: Session, url: String) = Unit
         fun onTitleChanged(session: Session, title: String) = Unit
         fun onProgress(session: Session, progress: Int) = Unit
@@ -96,9 +98,18 @@ class Session(
     data class SecurityInfo(val secure: Boolean = false, val host: String = "", val issuer: String = "")
 
     /**
+     * The initial URL.
+     */
+    var initialUrl: String by Delegates.observable(initialUrl) { _, old, new ->
+        if (notifyObservers(old, new) { onUrlChanged(this@Session, new) }) {
+            store?.syncDispatch(ContentAction.UpdateInitialUrlAction(id, new))
+        }
+    }
+
+    /**
      * The currently loading or loaded URL.
      */
-    var url: String by Delegates.observable(initialUrl) { _, old, new ->
+    var url: String by Delegates.observable("about:blank") { _, old, new ->
         if (notifyObservers(old, new) { onUrlChanged(this@Session, new) }) {
             store?.syncDispatch(UpdateUrlAction(id, new))
         }

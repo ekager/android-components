@@ -79,8 +79,8 @@ fun createTab(
     return TabSessionState(
         id = id,
         content = ContentState(
-            url,
-            private,
+            initialUrl = url,
+            private = private,
             title = title,
             thumbnail = thumbnail
         ),

@@ -64,7 +64,7 @@ fun createCustomTab(
 ): CustomTabSessionState {
     return CustomTabSessionState(
         id = id,
-        content = ContentState(url),
+        content = ContentState(initialUrl = url),
         config = config,
         contextId = contextId,
         engineState = EngineState(

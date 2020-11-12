@@ -58,11 +58,11 @@ internal class LinkingMiddleware(
             return
         }
 
-        if (tab.content.url.isExtensionUrl()) {
+        if (tab.content.initialUrl.isExtensionUrl()) {
             // The parent tab/session is used as a referrer which is not accurate
             // for extension pages. The extension page is not loaded by the parent
             // tab, but opened by an extension e.g. via browser.tabs.update.
-            performLoadOnMainThread(action.engineSession, tab.content.url)
+            performLoadOnMainThread(action.engineSession, tab.content.initialUrl)
         } else {
             val parentEngineSession = if (tab is TabSessionState) {
                 tab.parentId?.let { context.state.findTabOrCustomTab(it)?.engineState?.engineSession }
@@ -70,7 +70,7 @@ internal class LinkingMiddleware(
                 null
             }
 
-            performLoadOnMainThread(action.engineSession, tab.content.url, parentEngineSession)
+            performLoadOnMainThread(action.engineSession, tab.content.initialUrl, parentEngineSession)
         }
     }
 

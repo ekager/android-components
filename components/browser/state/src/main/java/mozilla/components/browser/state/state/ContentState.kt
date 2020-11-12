@@ -48,7 +48,8 @@ import mozilla.components.concept.engine.window.WindowRequest
  * @property appPermissionRequestsList Holds unprocessed app requests.
  */
 data class ContentState(
-    val url: String,
+    val url: String = "about:blank",
+    val initialUrl: String,
     val private: Boolean = false,
     val title: String = "",
     val progress: Int = 0,

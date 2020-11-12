@@ -35,6 +35,9 @@ internal object ContentStateReducer {
 
                 it.copy(url = action.url, icon = icon)
             }
+            is ContentAction.UpdateInitialUrlAction -> updateContentState(state, action.sessionId) {
+                it.copy(initialUrl = action.url)
+            }
             is ContentAction.UpdateProgressAction -> updateContentState(state, action.sessionId) {
                 it.copy(progress = action.progress)
             }

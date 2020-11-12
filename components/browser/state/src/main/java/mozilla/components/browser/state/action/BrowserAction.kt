@@ -274,6 +274,11 @@ sealed class ContentAction : BrowserAction() {
     /**
      * Updates the URL of the [ContentState] with the given [sessionId].
      */
+    data class UpdateInitialUrlAction(val sessionId: String, val url: String) : ContentAction()
+
+    /**
+     * Updates the URL of the [ContentState] with the given [sessionId].
+     */
     data class UpdateUrlAction(val sessionId: String, val url: String) : ContentAction()
 
     /**
